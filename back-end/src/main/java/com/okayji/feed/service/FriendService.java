@@ -11,4 +11,5 @@ public interface FriendService {
     void acceptFriendRequest(String friendRequestId);
     void deleteFriendRequest(String friendRequestId);
     void unfriend(String fromUserId, String anotherUserIdOrUsername);
+    List<ProfileBasicResponse> getFriends(String userId);
 }

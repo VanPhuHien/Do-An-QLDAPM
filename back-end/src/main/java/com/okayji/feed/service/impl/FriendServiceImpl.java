@@ -144,4 +144,16 @@ public class FriendServiceImpl implements FriendService {
                 ))
                 .toList();
     }
+
+
+    @Override
+    public List<ProfileBasicResponse> getFriends(String userId) {
+        return friendRepository
+                .findByUserLowIdOrUserHighId(userId, userId).stream()
+                .map(friend -> profileMapper.toProfileBasicResponse(
+                        friend.getUserLow().getId().equals(userId)
+                                ? friend.getUserHigh().getProfile()
+                                : friend.getUserLow().getProfile()))
+                .toList();
+    }
 }
