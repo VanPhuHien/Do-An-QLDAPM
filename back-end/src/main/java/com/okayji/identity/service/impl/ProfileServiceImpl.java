@@ -19,7 +19,6 @@ import com.okayji.mapper.ProfileMapper;
 import com.okayji.utils.PairUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -72,29 +71,27 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
-    @Transactional
     public ProfileResponse updateUserProfile(String userId, ProfileUpdateRequest profileUpdateRequest) {
-        validateImageUrls(profileUpdateRequest);
+
+        if (!profileUpdateRequest.getAvatarUrl().isBlank()) {
+            String avatarUrlContentType = s3Service
+                    .getContentTypeFromS3Url(profileUpdateRequest.getAvatarUrl());
+            if (!S3MediaTypes.isImageType(avatarUrlContentType))
+                throw new AppException(AppError.INVALID_INPUT_DATA);
+        }
+        if (!profileUpdateRequest.getCoverImageUrl().isBlank()) {
+            String coverImageUrlContentType = s3Service
+                    .getContentTypeFromS3Url(profileUpdateRequest.getCoverImageUrl());
+            if (!S3MediaTypes.isImageType(coverImageUrlContentType))
+                throw new AppException(AppError.INVALID_INPUT_DATA);
+        }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
 
         Profile profile = user.getProfile();
         profileMapper.updateProfile(profile, profileUpdateRequest);
+        profileRepository.save(profile);
         return profileMapper.toProfileResponse(profile);
-    }
-
-    private void validateImageUrls(ProfileUpdateRequest req) {
-        if (req.getAvatarUrl() != null && !req.getAvatarUrl().isBlank()) {
-            String contentType = s3Service.getContentTypeFromS3Url(req.getAvatarUrl());
-            if (!S3MediaTypes.isImageType(contentType))
-                throw new AppException(AppError.INVALID_INPUT_DATA);
-        }
-
-        if (req.getCoverImageUrl() != null && !req.getCoverImageUrl().isBlank()) {
-            String contentType = s3Service.getContentTypeFromS3Url(req.getCoverImageUrl());
-            if (!S3MediaTypes.isImageType(contentType))
-                throw new AppException(AppError.INVALID_INPUT_DATA);
-        }
     }
 }

@@ -1,7 +1,7 @@
 package com.okayji.identity.controller;
 
-import com.okayji.common.ApiResponse;
 import com.okayji.identity.dto.request.UserChangePasswordRequest;
+import com.okayji.common.ApiResponse;
 import com.okayji.identity.dto.request.UserChangeUsernameRequest;
 import com.okayji.identity.dto.response.ProfileBasicResponse;
 import com.okayji.identity.entity.User;

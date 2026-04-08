@@ -1,7 +1,5 @@
 package com.okayji.identity.service.impl;
 
-import com.okayji.exception.AppError;
-import com.okayji.exception.AppException;
 import com.okayji.identity.dto.request.UserChangePasswordRequest;
 import com.okayji.identity.dto.request.UserChangeUsernameRequest;
 import com.okayji.identity.dto.request.UserCreationRequest;
@@ -11,19 +9,21 @@ import com.okayji.identity.entity.Profile;
 import com.okayji.identity.entity.Role;
 import com.okayji.identity.entity.User;
 import com.okayji.identity.entity.UserRole;
+import com.okayji.exception.AppError;
+import com.okayji.exception.AppException;
+import com.okayji.mapper.ProfileMapper;
+import com.okayji.mapper.UserMapper;
 import com.okayji.identity.repository.RoleRepository;
 import com.okayji.identity.repository.UserRepository;
 import com.okayji.identity.service.UserService;
-import com.okayji.mapper.ProfileMapper;
-import com.okayji.mapper.UserMapper;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.HashSet;
