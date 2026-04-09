@@ -39,6 +39,10 @@ public class PermissionCheck {
                 : friendRepository.existsByUserLowIdAndUserHighId(friendId, userId);
     }
 
+    public boolean canAccessChat(String userId, String chatId) {
+        return chatMemberRepository.existsByChatIdAndMemberId(chatId, userId);
+    }
+
     /**
      *
      * @param userId
