@@ -181,16 +181,6 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public Page<ChatResponse> getChats(String userId, int page, int size) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
-        Pageable pageable = PageRequest.of(page, size);
-
-        return chatRepository.findMyChatsOrderByLastMessageAt(user.getId(), pageable)
-                .map(chat -> getChatResponse(chat, user));
-    }
-
-    @Override
     public ChatResponse getChat(String userId, String chatId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
@@ -198,6 +188,16 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new AppException(AppError.CHAT_NOT_FOUND));
 
         return getChatResponse(chat, user);
+    }
+
+    @Override
+    public Page<ChatResponse> getChats(String userId, int page, int size) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND));
+        Pageable pageable = PageRequest.of(page, size);
+
+        return chatRepository.findMyChatsOrderByLastMessageAt(user.getId(), pageable)
+                .map(chat -> getChatResponse(chat, user));
     }
 
     @Override

@@ -15,8 +15,8 @@ public interface ChatService {
     Long unreadCount(String userId);
     ChatResponse createGroupChat(String userId, CreateGroupChatRequest createGroupChatRequest);
     ChatResponse updateGroupChat(String groupId, UpdateGroupChatRequest updateGroupChatRequest);
-    Page<ChatResponse> getChats(String userId, int page, int size);
     ChatResponse getChat(String userId, String chatId);
+    Page<ChatResponse> getChats(String userId, int page, int size);
     List<ChatMemberResponse> getMembers(String chatId);
     ListMessageResponse getMessages(String chatId, int limit, Long cursorSeq);
 }

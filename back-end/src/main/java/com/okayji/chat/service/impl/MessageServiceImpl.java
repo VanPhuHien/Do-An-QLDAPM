@@ -59,7 +59,6 @@ public class MessageServiceImpl implements MessageService {
         )
                 throw new AppException(AppError.INVALID_INPUT_DATA);
 
-
         Message message = Message.builder()
                 .type(messageRequest.getType())
                 .content(messageRequest.getContent())

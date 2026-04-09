@@ -9,8 +9,8 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @Getter
 public class ChatMemberResponse {
+    String memberId;
     String memberFullName;
     String memberAvatarUrl;
-    String memberId;
     String chatId;
 }
