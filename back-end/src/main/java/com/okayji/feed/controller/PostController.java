@@ -55,6 +55,17 @@ public class PostController {
                 .build();
     }
 
+    @PostMapping
+    @Operation(summary = "Create post")
+    ApiResponse<PostResponse> createPost(@Valid @RequestBody PostCreationRequest postCreationRequest,
+                                         @CurrentUser User currentUser) {
+        return ApiResponse.<PostResponse>builder()
+                .success(true)
+                .message("Create post success")
+                .data(postService.createPost(currentUser.getId(), postCreationRequest))
+                .build();
+    }
+
     @GetMapping("/{postId}/comments")
     @Operation(summary = "Get comments in post by postId")
     @PreAuthorize("@permissionCheck.canViewPost(#currentUser.id, #postId)")
@@ -66,17 +77,6 @@ public class PostController {
         return ApiResponse.<Page<CommentResponse>>builder()
                 .success(true)
                 .data(commentService.getCommentsByPostId(postId, page, size))
-                .build();
-    }
-
-    @PostMapping
-    @Operation(summary = "Create post")
-    ApiResponse<PostResponse> createPost(@Valid @RequestBody PostCreationRequest postCreationRequest,
-                                         @CurrentUser User currentUser) {
-        return ApiResponse.<PostResponse>builder()
-                .success(true)
-                .message("Create post success")
-                .data(postService.createPost(currentUser.getId(), postCreationRequest))
                 .build();
     }
 

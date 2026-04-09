@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 public class ReactionServiceImpl implements ReactionService {
 
     @Override
-    public void like(String userId, String postId) {
+    public void unlike(String userId, String postId) {
 
     }
 
     @Override
-    public void unlike(String userId, String postId) {
+    public void like(String userId, String postId) {
 
     }
 }
