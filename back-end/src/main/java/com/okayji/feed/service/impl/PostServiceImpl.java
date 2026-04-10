@@ -56,6 +56,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Page<PostResponse> searchPosts(String viewerId, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Post> postPage = postRepository.searchPublishedPosts(viewerId, keyword, pageable);
+
+        return postPage.map(post -> postMapper.toPostResponse(post,
+                reactionRepository.existsByPostIdAndUserId(post.getId(), viewerId),
+                reactionRepository.countByPostId(post.getId()),
+                commentRepository.countByPostId(post.getId())
+        ));
+    }
+
+    @Override
     @Transactional
     public PostResponse createPost(String userId, PostCreationRequest postCreationRequest) {
         User user = userRepository.findById(userId)
@@ -131,23 +143,12 @@ public class PostServiceImpl implements PostService {
             postPage = postRepository.findPublishedPostsByUserId(user.getId(), pageable);
 
         return postPage.map(post -> postMapper
-                .toPostResponse(post,
+                .toPostResponse(
+                        post,
                         reactionRepository.existsByPostIdAndUserId(post.getId(), viewerId),
                         reactionRepository.countByPostId(post.getId()),
                         commentRepository.countByPostId(post.getId())
                 )
         );
-    }
-
-    @Override
-    public Page<PostResponse> searchPosts(String viewerId, String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Post> postPage = postRepository.searchPublishedPosts(viewerId, keyword, pageable);
-
-        return postPage.map(post -> postMapper.toPostResponse(post,
-                reactionRepository.existsByPostIdAndUserId(post.getId(), viewerId),
-                reactionRepository.countByPostId(post.getId()),
-                commentRepository.countByPostId(post.getId())
-        ));
     }
 }
