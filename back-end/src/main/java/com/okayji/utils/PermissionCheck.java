@@ -33,6 +33,41 @@ public class PermissionCheck {
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
 
+    public boolean canViewPost(String viewerId, String postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(AppError.POST_NOT_FOUND));
+        User author = post.getUser();
+
+        boolean isOwner = author.getId().equals(viewerId);
+        boolean canNonOwnerSee = (author.getProfile().getVisibility() == PUBLIC || isFriend(viewerId, author.getId()))
+                && post.getStatus() == PUBLISHED;
+        return isOwner || canNonOwnerSee;
+    }
+
+    public boolean canViewProfilePosts(String viewerId, String userIdOrUsername) {
+        Profile profile = userRepository.findUserByIdOrUsername(userIdOrUsername, userIdOrUsername)
+                .orElseThrow(() -> new AppException(AppError.USER_NOT_FOUND))
+                .getProfile();
+
+        return viewerId.equals(profile.getUserId())
+                || profile.getVisibility().equals(PUBLIC)
+                || isFriend(viewerId, profile.getUserId());
+    }
+
+    public boolean canAlterPost(String userId, String postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(AppError.POST_NOT_FOUND));
+
+        return post.getUser().getId().equals(userId);
+    }
+
+    public boolean canAlterComment(String userId, String commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new AppException(AppError.COMMENT_NOT_FOUND));
+
+        return comment.getUser().getId().equals(userId);
+    }
+
     public boolean isFriend(String userId, String friendId) {
         return userId.compareTo(friendId) < 0
                 ? friendRepository.existsByUserLowIdAndUserHighId(userId, friendId)
