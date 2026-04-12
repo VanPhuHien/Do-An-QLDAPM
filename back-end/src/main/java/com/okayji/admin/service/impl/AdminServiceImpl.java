@@ -66,6 +66,41 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public ModerationDashboardStats getDashboardStats(Integer year) {
+        long totalBlocked = postRepository.countByStatus(PostStatus.REJECTED);
+        long totalApproved = postRepository.countByStatus(PostStatus.PUBLISHED);
+        long totalReviewing = postRepository.countByStatus(PostStatus.UNDER_REVIEW);
+        long totalUsers = userRepository.count();
+        long totalChats = chatRepository.count();
+
+        int targetYearValue = (year != null) ? year : Year.now().getValue();
+        List<MonthlyUserStat> monthlyUsers = new ArrayList<>();
+
+        for (int i = 1; i <= 12; i++) {
+            YearMonth targetMonth = YearMonth.of(targetYearValue, i);
+
+            // Ngày đầu tháng lúc 00:00:00
+            LocalDateTime startOfMonth = targetMonth.atDay(1).atStartOfDay();
+            // Ngày cuối tháng lúc 23:59:59.999999999
+            LocalDateTime endOfMonth = targetMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+
+            Instant startInstant = startOfMonth.atZone(ZoneId.systemDefault()).toInstant();
+            Instant endInstant = endOfMonth.atZone(ZoneId.systemDefault()).toInstant();
+            long count = userRepository.countByCreatedAtBetween(startInstant, endInstant);
+            String monthName = String.valueOf(targetMonth.getMonthValue());// Vd: 10, 11
+            monthlyUsers.add(new MonthlyUserStat(monthName, count));
+        }
+        return ModerationDashboardStats.builder()
+                .totalUsers(totalUsers)
+                .totalApproved(totalApproved)
+                .totalBlocked(totalBlocked)
+                .totalReviewing(totalReviewing)
+                .totalChats(totalChats)
+                .monthlyUsers(monthlyUsers)
+                .build();
+    }
+
+    @Override
     public Page<AdminPostResponse> getPostsForModeration(PostStatus status, Pageable pageable) {
         PostStatus targetStatus = (status != null) ? status: PostStatus.UNDER_REVIEW;
         Page<Post> posts = postRepository.findByStatus(targetStatus, pageable);
@@ -110,40 +145,5 @@ public class AdminServiceImpl implements AdminService {
 
         userRepository.save(user);
         return convertToResponse(user);
-    }
-
-    @Override
-    public ModerationDashboardStats getDashboardStats(Integer year) {
-        long totalBlocked = postRepository.countByStatus(PostStatus.REJECTED);
-        long totalApproved = postRepository.countByStatus(PostStatus.PUBLISHED);
-        long totalReviewing = postRepository.countByStatus(PostStatus.UNDER_REVIEW);
-        long totalUsers = userRepository.count();
-        long totalChats = chatRepository.count();
-
-        int targetYearValue = (year != null) ? year : Year.now().getValue();
-        List<MonthlyUserStat> monthlyUsers = new ArrayList<>();
-
-        for (int i = 1; i <= 12; i++) {
-            YearMonth targetMonth = YearMonth.of(targetYearValue, i);
-
-            // Ngày đầu tháng lúc 00:00:00
-            LocalDateTime startOfMonth = targetMonth.atDay(1).atStartOfDay();
-            // Ngày cuối tháng lúc 23:59:59.999999999
-            LocalDateTime endOfMonth = targetMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
-
-            Instant startInstant = startOfMonth.atZone(ZoneId.systemDefault()).toInstant();
-            Instant endInstant = endOfMonth.atZone(ZoneId.systemDefault()).toInstant();
-            long count = userRepository.countByCreatedAtBetween(startInstant, endInstant);
-            String monthName = String.valueOf(targetMonth.getMonthValue());// Vd: 10, 11
-            monthlyUsers.add(new MonthlyUserStat(monthName, count));
-        }
-        return ModerationDashboardStats.builder()
-                .totalUsers(totalUsers)
-                .totalApproved(totalApproved)
-                .totalBlocked(totalBlocked)
-                .totalReviewing(totalReviewing)
-                .totalChats(totalChats)
-                .monthlyUsers(monthlyUsers)
-                .build();
     }
 }

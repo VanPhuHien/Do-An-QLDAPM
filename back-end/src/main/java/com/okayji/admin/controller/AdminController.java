@@ -28,19 +28,6 @@ public class AdminController {
     private AdminService adminService;
     private ReportService reportService;
 
-    @GetMapping("/dashboard")
-    @Operation(summary = "Get moderation dashboard stats")
-    @PreAuthorize("hasRole('ADMIN')")
-    ApiResponse<ModerationDashboardStats> getDashboardStats(
-            @RequestParam(required = false) Integer year
-    ) {
-        return ApiResponse.<ModerationDashboardStats>builder()
-                .success(true)
-                .message("Dashboard stats retrieved successfully")
-                .data(adminService.getDashboardStats(year))
-                .build();
-    }
-
     @GetMapping("/posts")
     @Operation(summary = "Get posts for moderation")
     @PreAuthorize("hasRole('ADMIN')")
@@ -119,6 +106,19 @@ public class AdminController {
                 .success(true)
                 .message("Update status successfully")
                 .data(adminService.updateUserStatus(userId, status))
+                .build();
+    }
+
+    @GetMapping("/dashboard")
+    @Operation(summary = "Get moderation dashboard stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    ApiResponse<ModerationDashboardStats> getDashboardStats(
+            @RequestParam(required = false) Integer year
+    ) {
+        return ApiResponse.<ModerationDashboardStats>builder()
+                .success(true)
+                .message("Dashboard stats retrieved successfully")
+                .data(adminService.getDashboardStats(year))
                 .build();
     }
 }
