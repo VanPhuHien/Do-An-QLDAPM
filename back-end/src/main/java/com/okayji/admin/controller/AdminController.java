@@ -24,13 +24,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin")
 @AllArgsConstructor
 @Tag(name = "Admin Controller")
-@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
     private AdminService adminService;
     private ReportService reportService;
 
     @GetMapping("/dashboard")
     @Operation(summary = "Get moderation dashboard stats")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiResponse<ModerationDashboardStats> getDashboardStats(
             @RequestParam(required = false) Integer year
     ) {
@@ -43,6 +43,7 @@ public class AdminController {
 
     @GetMapping("/posts")
     @Operation(summary = "Get posts for moderation")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiResponse<Page<AdminPostResponse>> getPostsForModeration(
             @RequestParam(required = false, defaultValue = "UNDER_REVIEW") PostStatus status,
             Pageable pageable) {
@@ -56,6 +57,7 @@ public class AdminController {
 
     @PutMapping("/posts/{postId}/decision")
     @Operation(summary = "Update post status manually by admin")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiResponse<AdminPostResponse> updatePostStatus(
             @PathVariable String postId,
             @RequestParam PostStatus decision) {
@@ -68,6 +70,7 @@ public class AdminController {
 
     @GetMapping("/reports")
     @Operation(summary = "Get reports for management")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiResponse<Page<ReportResponse>> getReports(
             @RequestParam(required = false, defaultValue = "PENDING") ReportStatus status,
             Pageable pageable) {
@@ -80,6 +83,7 @@ public class AdminController {
 
     @PutMapping("/reports/{reportId}/resolve")
     @Operation(summary = "Resolve a report by admin")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiResponse<ReportResponse> resolveReport(
             @PathVariable String reportId,
             @RequestParam ReportStatus resolution,
@@ -93,6 +97,7 @@ public class AdminController {
 
     @GetMapping("/users")
     @Operation(summary = "Get users for moderation")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiResponse<Page<AdminUserResponse>> getUsersForModeration(
             @RequestParam(required = false, defaultValue = "ACTIVE") UserStatus status,
             Pageable pageable) {
@@ -105,6 +110,7 @@ public class AdminController {
 
     @PutMapping("/users/{userId}/update")
     @Operation(summary = "Resolve a report by admin")
+    @PreAuthorize("hasRole('ADMIN')")
     ApiResponse<AdminUserResponse> updateUserStatus(
             @PathVariable String userId,
             @RequestParam UserStatus status
