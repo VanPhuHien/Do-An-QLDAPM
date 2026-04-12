@@ -38,38 +38,30 @@ public class AdminServiceImpl implements AdminService {
     private final ChatRepository chatRepository;
     private final NotificationService notificationService;
 
-    @Override
-    public ModerationDashboardStats getDashboardStats(Integer year) {
-        long totalBlocked = postRepository.countByStatus(PostStatus.REJECTED);
-        long totalApproved = postRepository.countByStatus(PostStatus.PUBLISHED);
-        long totalReviewing = postRepository.countByStatus(PostStatus.UNDER_REVIEW);
-        long totalUsers = userRepository.count();
-        long totalChats = chatRepository.count();
+    private AdminPostResponse convertToResponse(Post post) {
+        return AdminPostResponse.builder()
+                .id(post.getId())
+                .content(post.getContent())
+                .status(post.getStatus())
+                .createdAt(post.getCreatedAt())
+                .authorId(post.getUser().getId())
+                .authorName(post.getUser().getUsername())
+                .authorAvatarUrl(post.getUser().getProfile().getAvatarUrl())
+                .postMedia(post.getPostMedia().stream()
+                        .map(m -> new PostMediaDto(m.getType(), m.getMediaUrl()))
+                        .collect(Collectors.toList()))
+                .build();
+    }
 
-        int targetYearValue = (year != null) ? year : Year.now().getValue();
-        List<MonthlyUserStat> monthlyUsers = new ArrayList<>();
-
-        for (int i = 1; i <= 12; i++) {
-            YearMonth targetMonth = YearMonth.of(targetYearValue, i);
-
-            // Ngày đầu tháng lúc 00:00:00
-            LocalDateTime startOfMonth = targetMonth.atDay(1).atStartOfDay();
-            // Ngày cuối tháng lúc 23:59:59.999999999
-            LocalDateTime endOfMonth = targetMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
-
-            Instant startInstant = startOfMonth.atZone(ZoneId.systemDefault()).toInstant();
-            Instant endInstant = endOfMonth.atZone(ZoneId.systemDefault()).toInstant();
-            long count = userRepository.countByCreatedAtBetween(startInstant, endInstant);
-            String monthName = String.valueOf(targetMonth.getMonthValue());// Vd: 10, 11
-            monthlyUsers.add(new MonthlyUserStat(monthName, count));
-        }
-        return ModerationDashboardStats.builder()
-                .totalUsers(totalUsers)
-                .totalApproved(totalApproved)
-                .totalBlocked(totalBlocked)
-                .totalReviewing(totalReviewing)
-                .totalChats(totalChats)
-                .monthlyUsers(monthlyUsers)
+    private AdminUserResponse convertToResponse(User user) {
+        return AdminUserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .fullName(user.getProfile() != null ? user.getProfile().getFullName() : null)
+                .avatarUrl(user.getProfile() != null ? user.getProfile().getAvatarUrl() : null)
                 .build();
     }
 
@@ -120,30 +112,38 @@ public class AdminServiceImpl implements AdminService {
         return convertToResponse(user);
     }
 
-    private AdminPostResponse convertToResponse(Post post) {
-        return AdminPostResponse.builder()
-                .id(post.getId())
-                .content(post.getContent())
-                .status(post.getStatus())
-                .createdAt(post.getCreatedAt())
-                .authorId(post.getUser().getId())
-                .authorName(post.getUser().getUsername())
-                .authorAvatarUrl(post.getUser().getProfile().getAvatarUrl())
-                .postMedia(post.getPostMedia().stream()
-                        .map(m -> new PostMediaDto(m.getType(), m.getMediaUrl()))
-                        .collect(Collectors.toList()))
-                .build();
-    }
+    @Override
+    public ModerationDashboardStats getDashboardStats(Integer year) {
+        long totalBlocked = postRepository.countByStatus(PostStatus.REJECTED);
+        long totalApproved = postRepository.countByStatus(PostStatus.PUBLISHED);
+        long totalReviewing = postRepository.countByStatus(PostStatus.UNDER_REVIEW);
+        long totalUsers = userRepository.count();
+        long totalChats = chatRepository.count();
 
-    private AdminUserResponse convertToResponse(User user) {
-        return AdminUserResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .status(user.getStatus())
-                .createdAt(user.getCreatedAt())
-                .fullName(user.getProfile() != null ? user.getProfile().getFullName() : null)
-                .avatarUrl(user.getProfile() != null ? user.getProfile().getAvatarUrl() : null)
+        int targetYearValue = (year != null) ? year : Year.now().getValue();
+        List<MonthlyUserStat> monthlyUsers = new ArrayList<>();
+
+        for (int i = 1; i <= 12; i++) {
+            YearMonth targetMonth = YearMonth.of(targetYearValue, i);
+
+            // Ngày đầu tháng lúc 00:00:00
+            LocalDateTime startOfMonth = targetMonth.atDay(1).atStartOfDay();
+            // Ngày cuối tháng lúc 23:59:59.999999999
+            LocalDateTime endOfMonth = targetMonth.atEndOfMonth().atTime(23, 59, 59, 999999999);
+
+            Instant startInstant = startOfMonth.atZone(ZoneId.systemDefault()).toInstant();
+            Instant endInstant = endOfMonth.atZone(ZoneId.systemDefault()).toInstant();
+            long count = userRepository.countByCreatedAtBetween(startInstant, endInstant);
+            String monthName = String.valueOf(targetMonth.getMonthValue());// Vd: 10, 11
+            monthlyUsers.add(new MonthlyUserStat(monthName, count));
+        }
+        return ModerationDashboardStats.builder()
+                .totalUsers(totalUsers)
+                .totalApproved(totalApproved)
+                .totalBlocked(totalBlocked)
+                .totalReviewing(totalReviewing)
+                .totalChats(totalChats)
+                .monthlyUsers(monthlyUsers)
                 .build();
     }
 }
