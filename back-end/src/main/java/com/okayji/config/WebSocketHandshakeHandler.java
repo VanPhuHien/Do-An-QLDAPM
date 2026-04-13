@@ -1,4 +1,4 @@
-WebSocketSecurityConfig.javapackage com.okayji.config;
+package com.okayji.config;
 
 import com.okayji.identity.service.JwtService;
 import io.jsonwebtoken.Claims;
