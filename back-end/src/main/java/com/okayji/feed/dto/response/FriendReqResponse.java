@@ -1,5 +1,6 @@
 package com.okayji.feed.dto.response;
 
+import com.okayji.identity.dto.response.ProfileBasicResponse;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

@@ -54,6 +54,22 @@ public class PermissionCheck {
                 || isFriend(viewerId, profile.getUserId());
     }
 
+    public boolean isFriend(String userId, String friendId) {
+        return userId.compareTo(friendId) < 0
+                ? friendRepository.existsByUserLowIdAndUserHighId(userId, friendId)
+                : friendRepository.existsByUserLowIdAndUserHighId(friendId, userId);
+    }
+
+    public boolean canReadNotification(String userId, Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new AppException(AppError.NOTI_NOT_FOUND));
+        return notification.getUser().getId().equals(userId);
+    }
+
+    public boolean canAccessChat(String userId, String chatId) {
+        return chatMemberRepository.existsByChatIdAndMemberId(chatId, userId);
+    }
+
     public boolean canAlterPost(String userId, String postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(AppError.POST_NOT_FOUND));
@@ -66,16 +82,6 @@ public class PermissionCheck {
                 .orElseThrow(() -> new AppException(AppError.COMMENT_NOT_FOUND));
 
         return comment.getUser().getId().equals(userId);
-    }
-
-    public boolean isFriend(String userId, String friendId) {
-        return userId.compareTo(friendId) < 0
-                ? friendRepository.existsByUserLowIdAndUserHighId(userId, friendId)
-                : friendRepository.existsByUserLowIdAndUserHighId(friendId, userId);
-    }
-
-    public boolean canAccessChat(String userId, String chatId) {
-        return chatMemberRepository.existsByChatIdAndMemberId(chatId, userId);
     }
 
     /**

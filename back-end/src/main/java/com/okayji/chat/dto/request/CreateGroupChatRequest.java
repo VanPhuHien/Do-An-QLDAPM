@@ -14,8 +14,8 @@ public class CreateGroupChatRequest {
     @NotBlank(message = "Chat name must not be blank")
     String chatName;
 
+    String chatAvatarUrl;
+
     @NotEmpty(message = "Group members is required")
     List<String> memberIds;
-
-    String chatAvatarUrl;
 }
