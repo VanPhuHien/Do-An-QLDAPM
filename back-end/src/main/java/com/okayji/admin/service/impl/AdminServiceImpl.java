@@ -38,33 +38,6 @@ public class AdminServiceImpl implements AdminService {
     private final ChatRepository chatRepository;
     private final NotificationService notificationService;
 
-    private AdminPostResponse convertToResponse(Post post) {
-        return AdminPostResponse.builder()
-                .id(post.getId())
-                .content(post.getContent())
-                .status(post.getStatus())
-                .createdAt(post.getCreatedAt())
-                .authorId(post.getUser().getId())
-                .authorName(post.getUser().getUsername())
-                .authorAvatarUrl(post.getUser().getProfile().getAvatarUrl())
-                .postMedia(post.getPostMedia().stream()
-                        .map(m -> new PostMediaDto(m.getType(), m.getMediaUrl()))
-                        .collect(Collectors.toList()))
-                .build();
-    }
-
-    private AdminUserResponse convertToResponse(User user) {
-        return AdminUserResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .status(user.getStatus())
-                .createdAt(user.getCreatedAt())
-                .fullName(user.getProfile() != null ? user.getProfile().getFullName() : null)
-                .avatarUrl(user.getProfile() != null ? user.getProfile().getAvatarUrl() : null)
-                .build();
-    }
-
     @Override
     public ModerationDashboardStats getDashboardStats(Integer year) {
         long totalBlocked = postRepository.countByStatus(PostStatus.REJECTED);
@@ -145,5 +118,32 @@ public class AdminServiceImpl implements AdminService {
 
         userRepository.save(user);
         return convertToResponse(user);
+    }
+
+    private AdminPostResponse convertToResponse(Post post) {
+        return AdminPostResponse.builder()
+                .id(post.getId())
+                .content(post.getContent())
+                .status(post.getStatus())
+                .createdAt(post.getCreatedAt())
+                .authorId(post.getUser().getId())
+                .authorName(post.getUser().getUsername())
+                .authorAvatarUrl(post.getUser().getProfile().getAvatarUrl())
+                .postMedia(post.getPostMedia().stream()
+                        .map(m -> new PostMediaDto(m.getType(), m.getMediaUrl()))
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private AdminUserResponse convertToResponse(User user) {
+        return AdminUserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .fullName(user.getProfile() != null ? user.getProfile().getFullName() : null)
+                .avatarUrl(user.getProfile() != null ? user.getProfile().getAvatarUrl() : null)
+                .build();
     }
 }

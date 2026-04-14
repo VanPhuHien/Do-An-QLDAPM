@@ -3,6 +3,7 @@ package com.okayji.feed.controller;
 import com.okayji.common.ApiResponse;
 import com.okayji.feed.dto.response.FriendReqResponse;
 import com.okayji.feed.service.FriendService;
+import com.okayji.identity.dto.response.ProfileBasicResponse;
 import com.okayji.identity.entity.User;
 import com.okayji.utils.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,14 @@ public class FriendController {
 
     private final FriendService friendService;
 
+    @GetMapping
+    @Operation(summary = "Get friend list")
+    public ApiResponse<List<ProfileBasicResponse>> getFriends(@CurrentUser User currentUser) {
+        return ApiResponse.<List<ProfileBasicResponse>>builder()
+                .success(true)
+                .data(friendService.getFriends(currentUser.getId()))
+                .build();
+    }
 
     @GetMapping("/received")
     @Operation(summary = "Get friend requests received")

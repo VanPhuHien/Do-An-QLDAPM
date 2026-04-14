@@ -14,12 +14,12 @@ import com.okayji.identity.entity.User;
 import com.okayji.identity.repository.UserRepository;
 import com.okayji.mapper.FriendRequestMapper;
 import com.okayji.mapper.ProfileMapper;
-import com.okayji.notification.service.NotificationFactory;
 import com.okayji.notification.service.NotificationService;
+import com.okayji.notification.service.NotificationFactory;
 import com.okayji.utils.PairUser;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -120,6 +120,16 @@ public class FriendServiceImpl implements FriendService {
         friendRepository.delete(friend);
     }
 
+    @Override
+    public List<ProfileBasicResponse> getFriends(String userId) {
+        return friendRepository
+                .findByUserLowIdOrUserHighId(userId, userId).stream()
+                .map(friend -> profileMapper.toProfileBasicResponse(
+                        friend.getUserLow().getId().equals(userId)
+                        ? friend.getUserHigh().getProfile()
+                        : friend.getUserLow().getProfile()))
+                .toList();
+    }
 
     @Override
     public List<FriendReqResponse> getFriendRequestSent(String userId) {
@@ -142,18 +152,6 @@ public class FriendServiceImpl implements FriendService {
                         profileMapper.toProfileBasicResponse(friendRequest.getSender().getProfile()),
                         profileMapper.toProfileBasicResponse(friendRequest.getReceiver().getProfile())
                 ))
-                .toList();
-    }
-
-
-    @Override
-    public List<ProfileBasicResponse> getFriends(String userId) {
-        return friendRepository
-                .findByUserLowIdOrUserHighId(userId, userId).stream()
-                .map(friend -> profileMapper.toProfileBasicResponse(
-                        friend.getUserLow().getId().equals(userId)
-                                ? friend.getUserHigh().getProfile()
-                                : friend.getUserLow().getProfile()))
                 .toList();
     }
 }

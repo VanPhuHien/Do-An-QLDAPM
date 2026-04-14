@@ -1,17 +1,14 @@
 package com.okayji.report.controller;
 
+import com.okayji.report.dto.request.CreateReportRequest;
 import com.okayji.common.ApiResponse;
 import com.okayji.identity.entity.User;
-import com.okayji.report.dto.request.CreateReportRequest;
 import com.okayji.report.service.ReportService;
 import com.okayji.utils.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/reports")
